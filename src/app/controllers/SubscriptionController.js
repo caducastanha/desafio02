@@ -1,8 +1,9 @@
 import * as Yup from 'yup';
-import { addMonths, format, parseISO } from 'date-fns';
+import { addMonths, parseISO } from 'date-fns';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
 import Subscription from '../models/Subscription';
+import Mail from '../../lib/Mail';
 
 class SubscriptionController {
   async store(req, res) {
@@ -45,6 +46,13 @@ class SubscriptionController {
       student_id,
       plan_id,
     });
+
+    await Mail.sendMail({
+      to: `${isStudent.name} <${isStudent.email}>`,
+      subject: 'Matricula realizada',
+      text: 'A sua matricula na academia foi realizada com sucesso.',
+    });
+
     return res.json(subs);
   }
 }
