@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
-import { addMonths, parseISO } from 'date-fns';
+import { addMonths, parseISO, format } from 'date-fns';
+import { pt } from 'date-fns/locale';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
 import Subscription from '../models/Subscription';
@@ -50,7 +51,16 @@ class SubscriptionController {
     await Mail.sendMail({
       to: `${isStudent.name} <${isStudent.email}>`,
       subject: 'Matricula realizada',
-      text: 'A sua matricula na academia foi realizada com sucesso.',
+      template: 'subscription',
+      context: {
+        student: isStudent.name,
+        plan: isPlan.title,
+        date: format(endDate, "dd'/'MM'/'yyyy", { locale: pt }),
+        price: subs.price.toLocaleString('pt-br', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+      },
     });
 
     return res.json(subs);
