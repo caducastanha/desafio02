@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { pt } from 'date-fns/locale/pt';
 import Mail from '../../lib/Mail';
 
@@ -17,7 +17,7 @@ class SubscriptionMail {
       context: {
         student: isStudent.name,
         plan: isPlan.title,
-        date: format(endDate, "dd'/'MM'/'yyyy", { locale: pt }),
+        date: format(parseISO(endDate), "dd'/'MM'/'yyyy", { locale: pt }),
         price: subs.price.toLocaleString('pt-br', {
           style: 'currency',
           currency: 'BRL',
