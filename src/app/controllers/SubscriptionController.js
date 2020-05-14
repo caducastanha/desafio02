@@ -77,6 +77,51 @@ class SubscriptionController {
 
     return res.json(subs);
   }
+
+  async update(req, res) {
+    const schema = Yup.object().shape({
+      start_date: Yup.date(),
+      plan_id: Yup.number(),
+    });
+
+    const isValid = await schema.isValid(req.body);
+
+    if (!isValid) {
+      return res.status(400).json({ error: 'Validation fails.' });
+    }
+
+    req.params.id = parseInt(req.params.id, 10);
+    const { id } = req.params;
+
+    const sub = await Subscription.findByPk(id);
+
+    if (!sub) {
+      return res.status(401).json({ error: 'Subscription not exists' });
+    }
+
+    const { plan_id, start_date } = req.body;
+
+    const isPlan = await Plan.findByPk(plan_id);
+
+    if (!isPlan) {
+      return res.status(401).json({ error: 'Plan not exists' });
+    }
+
+    const startDate = parseISO(start_date);
+
+    const endDate = addMonths(startDate, isPlan.duration);
+
+    const price = isPlan.price * isPlan.duration;
+
+    const updated = await sub.update({
+      start_date: startDate,
+      end_date: endDate,
+      price,
+      plan_id,
+    });
+
+    return res.json(updated);
+  }
 }
 
 export default new SubscriptionController();
