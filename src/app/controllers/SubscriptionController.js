@@ -57,6 +57,26 @@ class SubscriptionController {
 
     return res.json(subs);
   }
+
+  async index(req, res) {
+    const subs = await Subscription.findAll({
+      attributes: ['id', 'start_date', 'end_date'],
+      include: [
+        {
+          model: Student,
+          as: 'student',
+          attributes: ['id', 'name', 'email'],
+        },
+        {
+          model: Plan,
+          as: 'plan',
+          attributes: ['id', 'title', 'duration', 'price'],
+        },
+      ],
+    });
+
+    return res.json(subs);
+  }
 }
 
 export default new SubscriptionController();
