@@ -1,10 +1,10 @@
 import * as Yup from 'yup';
-import { addMonths, parseISO, format } from 'date-fns';
-import { pt } from 'date-fns/locale';
+import { addMonths, parseISO } from 'date-fns';
 import Student from '../models/Student';
 import Plan from '../models/Plan';
 import Subscription from '../models/Subscription';
-import Mail from '../../lib/Mail';
+import Queue from '../../lib/Queue';
+import SubscriptionMail from '../jobs/SubscriptionMail';
 
 class SubscriptionController {
   async store(req, res) {
@@ -48,19 +48,11 @@ class SubscriptionController {
       plan_id,
     });
 
-    await Mail.sendMail({
-      to: `${isStudent.name} <${isStudent.email}>`,
-      subject: 'Matricula realizada',
-      template: 'subscription',
-      context: {
-        student: isStudent.name,
-        plan: isPlan.title,
-        date: format(endDate, "dd'/'MM'/'yyyy", { locale: pt }),
-        price: subs.price.toLocaleString('pt-br', {
-          style: 'currency',
-          currency: 'BRL',
-        }),
-      },
+    await Queue.add(SubscriptionMail.key, {
+      isStudent,
+      isPlan,
+      subs,
+      endDate,
     });
 
     return res.json(subs);
