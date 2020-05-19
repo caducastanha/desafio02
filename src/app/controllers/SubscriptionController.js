@@ -60,7 +60,7 @@ class SubscriptionController {
 
   async index(req, res) {
     const subs = await Subscription.findAll({
-      attributes: ['id', 'start_date', 'end_date'],
+      attributes: ['id', 'start_date', 'end_date', 'price'],
       include: [
         {
           model: Student,
@@ -92,14 +92,13 @@ class SubscriptionController {
 
     req.params.id = parseInt(req.params.id, 10);
     const { id } = req.params;
+    const { plan_id, start_date } = req.body;
 
     const sub = await Subscription.findByPk(id);
 
     if (!sub) {
       return res.status(401).json({ error: 'Subscription not exists' });
     }
-
-    const { plan_id, start_date } = req.body;
 
     const isPlan = await Plan.findByPk(plan_id);
 
@@ -121,6 +120,21 @@ class SubscriptionController {
     });
 
     return res.json(updated);
+  }
+
+  async delete(req, res) {
+    req.params.id = parseInt(req.params.id, 10);
+    const { id } = req.params;
+
+    const subsExists = await Subscription.findByPk(id);
+
+    if (!subsExists) {
+      return res.status(400).json({ error: 'Subscription not exists' });
+    }
+
+    await subsExists.destroy(id);
+
+    return res.json({ message: 'Subscription deleted' });
   }
 }
 

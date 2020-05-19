@@ -1,6 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('subscriptions', {
+    return queryInterface.createTable('help_orders', {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
@@ -14,23 +14,15 @@ module.exports = {
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE',
       },
-      plan_id: {
-        type: Sequelize.INTEGER,
-        references: { model: 'plans', key: 'id' },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL',
+      question: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
-      start_date: {
+      answer: {
+        type: Sequelize.STRING,
+      },
+      answer_at: {
         type: Sequelize.DATE,
-        allowNull: false,
-      },
-      end_date: {
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
-      price: {
-        type: Sequelize.REAL,
-        allowNull: false,
       },
       created_at: {
         type: Sequelize.DATE,
@@ -44,6 +36,6 @@ module.exports = {
   },
 
   down: (queryInterface) => {
-    return queryInterface.dropTable('subscriptions');
+    return queryInterface.dropTable('help_orders');
   },
 };
